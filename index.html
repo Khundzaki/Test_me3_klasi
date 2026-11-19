@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ზოგადი ტესტი – მე-3 კლასი</title>
+<style>
+:root{--bg:#e8f2ff;--card:#fff;--ink:#17233c;--mut:#5b6b88;--pri:#2b59c3;--onpri:#fff;--line:#c9d8f2;--ok:#1e9e5a;--okb:#dff5e8;--no:#d6453d;--nob:#fde4e2;--acc:#ffc93c}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1830;--card:#18254a;--ink:#eef3ff;--mut:#a5b4d4;--pri:#7ea2ff;--onpri:#0f1830;--line:#2e3f6e;--okb:#12382a;--nob:#3f1d1f}}
+*{box-sizing:border-box}
+body{margin:0;padding:16px;background:var(--bg);color:var(--ink);font-family:"Noto Sans Georgian","BPG Nino Mtavruli",Sylfaen,system-ui,sans-serif;display:flex;justify-content:center}
+main{width:100%;max-width:560px}
+.card{background:var(--card);border-radius:20px;padding:22px;box-shadow:0 6px 0 var(--line)}
+h1{font-size:28px;margin:0 0 8px}
+h2{font-size:22px;line-height:1.4;margin:18px 0}
+p{color:var(--mut);line-height:1.5;margin:0 0 18px}
+.top{display:flex;justify-content:space-between;color:var(--mut);font-size:15px;margin-bottom:8px}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);transition:width .3s}
+.opts{display:grid;gap:10px}
+button{font:inherit;font-size:19px;text-align:left;min-height:54px;padding:10px 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.opts button:hover:not(:disabled){border-color:var(--pri)}
+.opts button.ok{background:var(--okb);border-color:var(--ok)}
+.opts button.no{background:var(--nob);border-color:var(--no)}
+.go{background:var(--pri);color:var(--onpri);border-color:var(--pri);text-align:center;width:100%;margin-top:16px;font-weight:700}
+.score{font-size:54px;font-weight:800;margin:6px 0}
+.miss{font-size:16px;color:var(--mut);line-height:1.6;padding-left:18px}
+</style>
+</head>
+<body>
+<main><div class="card" id="app"></div></main>
+<script>
+const R=n=>Math.floor(Math.random()*n),ri=(a,b)=>a+R(b-a+1),pick=a=>a[R(a.length)];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ახლო პასუხები რიცხვებისთვის */
+function mk(q,c,g){const s=new Set([c]);for(const d of shuf([1,2,3,4,5,10,-1,-2,-3,-10])){if(s.size>=4)break;if(c+d>=0)s.add(c+d)}return{q,a:String(c),o:shuf([...s]).map(String),g}}
+
+const nm=["ნინოს","გიოს","ანას","დათოს","ლუკას","ლიზის"],th=["რვეული","ფანქარი","წიგნი","ბურთი"],fr=["ვაშლი","ატამი","მსხალი","კანფეტი"];
+const M=[
+()=>{const b=ri(2,9),a=ri(2,Math.floor(40/b)),c=ri(10,100-a*b);return mk(`${a} × ${b} + ${c} = ?`,a*b+c)},
+()=>{const b=ri(2,5),q=ri(2,Math.floor(20/b)),c=ri(10,95);return mk(`${b*q} : ${b} + ${c} = ?`,q+c)},
+()=>{const b=ri(2,9),a=ri(2,Math.floor(40/b)),p=a*b,c=ri(p+5,100);return mk(`${c} − ${a} × ${b} = ?`,c-p)},
+()=>{const b=ri(3,9),a=ri(3,Math.floor(40/b)),p=a*b,c=ri(3,p-2);return mk(`${a} × ${b} − ${c} = ?`,p-c)},
+()=>{const b=ri(3,9),a=ri(2,Math.floor(40/b)),p=a*b,m=ri(p+5,100);return mk(`${pick(nm)} ${m} ლარი ჰქონდა. იყიდა ${a} ${pick(th)}, თითო ${b} ლარად. რამდენი ლარი დარჩა?`,m-p)},
+()=>{const k=ri(2,5),q=ri(2,Math.floor(20/k)),c=ri(2,9),f=pick(fr);return mk(`${k*q} ${f} ${k} ბავშვმა თანაბრად გაიყო. შემდეგ თითოს კიდევ ${c} ${f} მიუმატეს. რამდენი ${f} ჰქონდა თითოეულს?`,q+c)}
+];
+
+/* გენერირებული ლოგიკა */
+const seqQ=()=>{const s=ri(1,20),d=ri(2,9);return mk(`გააგრძელე რიგი: ${s}, ${s+d}, ${s+2*d}, ${s+3*d}, ?`,s+4*d,"ლოგიკა")};
+const legsQ=()=>{const a=ri(2,8),b=ri(2,6);return mk(`ეზოში ${a} ქათამი და ${b} ძროხაა. რამდენი ფეხია სულ?`,2*a+4*b,"ლოგიკა")};
+const heightQ=()=>{const [x,y,z]=shuf(["ანა","ნინო","გიო","დათო","ლუკა","ლიზი","სანდრო"]).slice(0,3),hi=R(2);
+ return{q:`${x} ${y}ზე მაღალია, ${y} ${z}ზე მაღალია. ვინ არის ყველაზე ${hi?"მაღალი":"დაბალი"}?`,a:hi?x:z,o:shuf([x,y,z,"ზუსტად ვერ გავიგებთ"]),g:"ლოგიკა"}};
+
+/* კითხვების ბანკი: [კითხვა, სწორი, არასწორი, არასწორი, არასწორი] */
+const B={
+"ლოგიკა":[
+["რომელია ზედმეტი? ვაშლი, მსხალი, ატამი, კარტოფილი","კარტოფილი","ვაშლი","მსხალი","ატამი"],
+["რომელია ზედმეტი? ბეღურა, მერცხალი, ქათამი, თევზი","თევზი","ბეღურა","მერცხალი","ქათამი"],
+["რომელია ზედმეტი? მაგიდა, სკამი, კარადა, ჭიქა","ჭიქა","მაგიდა","სკამი","კარადა"],
+["დღეს სამშაბათია. ზეგ რა დღე იქნება?","ხუთშაბათი","ოთხშაბათი","პარასკევი","ორშაბათი"]],
+"ბუნება":[
+["რომელი ჩიტი არ დაფრინავს?","პინგვინი","მერცხალი","არწივი","ბეღურა"],
+["რამდენი ფეხი აქვს ობობას?","8","6","10","4"],
+["წყლის გარდა, მცენარეს ზრდისთვის კიდევ რა სჭირდება?","მზის სინათლე","ქვიშა","თოვლი","ქარი"],
+["რომელი ცხოველი იძინებს ზამთრის განმავლობაში?","დათვი","მგელი","მელა","კურდღელი"],
+["რა ტემპერატურაზე იყინება წყალი?","0 გრადუსზე","10 გრადუსზე","−10 გრადუსზე","100 გრადუსზე"],
+["რომელი ორგანო გვეხმარება სუნთქვაში?","ფილტვები","გული","კუჭი","ღვიძლი"],
+["რომელია ხმელეთის ყველაზე დიდი ცხოველი?","სპილო","ჟირაფი","ჰიპოპოტამი","მარტორქა"],
+["რომელი ხე არ ყრის ფოთლებს ზამთარში?","ნაძვი","მუხა","ნეკერჩხალი","ბალი"],
+["რომელია ქართული მდინარე?","მტკვარი","ნილოსი","ამაზონი","დუნაი"],
+["რომელი ზღვა ესაზღვრება საქართველოს დასავლეთიდან?","შავი ზღვა","კასპიის ზღვა","წითელი ზღვა","ხმელთაშუა ზღვა"]],
+"ხელოვნება":[
+["რა ფერი მიიღება ყვითელისა და ლურჯის შერევით?","მწვანე","ნარინჯისფერი","იისფერი","ყავისფერი"],
+["რა ფერი მიიღება წითელისა და ყვითელის შერევით?","ნარინჯისფერი","მწვანე","იისფერი","ყავისფერი"],
+["რომელია ქართველი მხატვარი?","ნიკო ფიროსმანი","ლეონარდო და ვინჩი","პაბლო პიკასო","ვინსენტ ვან გოგი"],
+["ადამიანის ნახატს რა ჰქვია?","პორტრეტი","პეიზაჟი","ნატურმორტი","ორნამენტი"],
+["ბუნების (მთების, ტყის, მდინარის) ნახატს რა ჰქვია?","პეიზაჟი","პორტრეტი","ნატურმორტი","ორნამენტი"]],
+"მუსიკა":[
+["რომელია ქართული ხალხური სიმებიანი საკრავი?","ჩონგური","ზურნა","დოლი","სალამური"],
+["რამდენი ძირითადი ნოტია მუსიკაში (დო, რე, მი...)?","7","5","6","8"],
+["რომელი საკრავია დასარტყმელი?","დოლი","ზურნა","ჩონგური","სალამური"],
+["რომელია ქართული ხალხური ცეკვა?","ხორუმი","ვალსი","ტანგო","სამბა"],
+["რომელ საკრავს აქვს თეთრ-შავი კლავიშები?","ფორტეპიანო","გიტარა","დოლი","საყვირი"]],
+"ქართული":[
+["რამდენი ასოა ქართულ ანბანში?","33","31","32","34"],
+["რომელი სიტყვაა ზმნა (პასუხობს კითხვას „რას აკეთებს?“)?","წერს","ლამაზი","წიგნი","ხუთი"],
+["რომელი სიტყვაა ზედსართავი სახელი (პასუხობს კითხვას „როგორი?“)?","ლამაზი","წერს","წიგნი","ხუთი"],
+["რამდენი ხმოვანია ქართულში?","5","4","6","7"],
+["რომელი სიტყვაა საპირისპირო სიტყვის „დიდი“?","პატარა","მაღალი","ბევრი","ძველი"],
+["რა ჰქვია საქართველოს დედაქალაქს?","თბილისი","ქუთაისი","ბათუმი","რუსთავი"]]
+};
+
+/* უკვე ნანახი კითხვები იმახსოვრება, რომ ახალ ტესტში სხვები ამოვარდეს */
+let seen={};try{seen=JSON.parse(localStorage.getItem("t3seen")||"{}")}catch(e){}
+function take(g,n){const a=B[g];let r=shuf(a.filter(x=>!seen[x[0]])).slice(0,n);
+ if(r.length<n){a.forEach(x=>delete seen[x[0]]);r=r.concat(shuf(a.filter(x=>!r.includes(x))).slice(0,n-r.length))}
+ r.forEach(x=>seen[x[0]]=1);try{localStorage.setItem("t3seen",JSON.stringify(seen))}catch(e){}
+ return r.map(x=>({q:x[0],a:x[1],o:shuf(x.slice(1)),g}))}
+
+function build(){
+ const math=shuf(M).slice(0,5).map(f=>{const x=f();x.g="მათემატიკა";return x});
+ const lg=pick([heightQ,legsQ,()=>take("ლოგიკა",1)[0]])();
+ return shuf([...math,seqQ(),lg,...take("ბუნება",3),...take("ხელოვნება",1),...take("მუსიკა",2),...take("ქართული",2)]);
+}
+
+const app=document.getElementById("app");let qs,i,sc,miss,locked;
+function home(){app.innerHTML=`<h1>ზოგადი ტესტი</h1><p>მე-3 კლასი · 15 კითხვა. ყოველ ჯერზე კითხვები განსხვავებულია.</p><button class="go" id="st">დაწყება</button>`;document.getElementById("st").onclick=start}
+function start(){qs=build();i=0;sc=0;miss=[];show()}
+function show(){const x=qs[i];locked=false;
+ app.innerHTML=`<div class="top"><span>${x.g}</span><span>${i+1} / ${qs.length}</span></div><div class="bar"><i style="width:${i/qs.length*100}%"></i></div><h2>${x.q}</h2><div class="opts">${x.o.map(t=>`<button>${t}</button>`).join("")}</div><div id="nx"></div>`;
+ app.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>answer(b,x))}
+function answer(b,x){if(locked)return;locked=true;
+ const bs=[...app.querySelectorAll(".opts button")];bs.forEach(e=>{if(e.textContent===x.a)e.classList.add("ok");e.disabled=true});
+ if(b.textContent===x.a)sc++;else{b.classList.add("no");miss.push(x)}
+ const n=document.getElementById("nx");n.innerHTML=`<button class="go">${i+1<qs.length?"შემდეგი":"შედეგის ნახვა"}</button>`;
+ n.firstChild.focus();n.firstChild.onclick=()=>{i++;i<qs.length?show():finish()}}
+function finish(){const m=sc>=13?"შესანიშნავია!":sc>=9?"ძალიან კარგი!":"კარგია, კიდევ სცადე!";
+ app.innerHTML=`<h1>${m}</h1><div class="score">${sc} / ${qs.length}</div>${miss.length?`<p>სწორი პასუხები იმ კითხვებზე, სადაც შეცდომა იყო:</p><ul class="miss">${miss.map(x=>`<li>${x.q} → <b>${x.a}</b></li>`).join("")}</ul>`:""}<button class="go" id="again">ახალი ტესტი</button>`;
+ document.getElementById("again").onclick=start}
+home();
+</script>
+</body>
+</html>
